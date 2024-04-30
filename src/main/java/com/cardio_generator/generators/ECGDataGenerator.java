@@ -1,3 +1,8 @@
+/**
+ * Represents a patient ECG data generator for health monitoring simulations.
+ * This class is responsible for generating randomized, but realistic ECG Data.
+ * It utilizes a peudo-random number generator to simulate this data
+ */
 package com.cardio_generator.generators;
 
 import java.util.Random;
@@ -8,7 +13,11 @@ public class ECGDataGenerator implements PatientDataGenerator {
     private static final Random random = new Random();
     private double[] lastEcgValues;
     private static final double PI = Math.PI;
-
+    /**
+     * Initializes ECGGenerator object
+     * 
+     * @param patientCount Amount of Patients to simluate ECG Data for
+     */
     public ECGDataGenerator(int patientCount) {
         lastEcgValues = new double[patientCount + 1];
         // Initialize the last ECG value for each patient
@@ -17,6 +26,13 @@ public class ECGDataGenerator implements PatientDataGenerator {
         }
     }
 
+    /**
+     * Generates ECG data for a patient
+     * The ECG is generated in waveform, the heart rate oscillating between amplitudes of 60 and 80 bpm
+     * 
+     * @param patientId Patient to generate data for
+     * @param outputStrategy Way of outputting the simulated data
+     */
     @Override
     public void generate(int patientId, OutputStrategy outputStrategy) {
         // TODO Check how realistic this data is and make it more realistic if necessary
@@ -30,6 +46,13 @@ public class ECGDataGenerator implements PatientDataGenerator {
         }
     }
 
+    /**
+     * simulates ECG Wave after call from generate method
+     * 
+     * @param patientId Patient to generate data for
+     * @param lastEcgValue last observed ECG Value of patient
+     * @return next simulated ECG Value
+     */
     private double simulateEcgWaveform(int patientId, double lastEcgValue) {
         // Simplified ECG waveform generation based on sinusoids
         double hr = 60.0 + random.nextDouble() * 20.0; // Simulate heart rate variability between 60 and 80 bpm

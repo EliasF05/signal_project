@@ -1,3 +1,8 @@
+/**
+ * Represents a patient's blood saturation level for health monitoring simulations
+ * This class is responsible for generating randomized, but realistic blood saturation data
+ * It utilizes a pseudo-random number generator to simulate the data
+ */
 package com.cardio_generator.generators;
 
 import java.util.Random;
@@ -8,6 +13,11 @@ public class BloodSaturationDataGenerator implements PatientDataGenerator {
     private static final Random random = new Random();
     private int[] lastSaturationValues;
 
+    /**
+     * Intializes BloodSaturationDataGenerator object
+     * 
+     * @param patientCount Amount of patients to simulate blood saturation data for
+     */
     public BloodSaturationDataGenerator(int patientCount) {
         lastSaturationValues = new int[patientCount + 1];
 
@@ -17,6 +27,13 @@ public class BloodSaturationDataGenerator implements PatientDataGenerator {
         }
     }
 
+    /**
+     * Generates blood saturation data for a patient
+     * Ensures saturation stays within a realistic range
+     * 
+     * @param patientId Patient to generate the data for 
+     * @param outputStrategy Way of outputting the simulated data
+     */
     @Override
     public void generate(int patientId, OutputStrategy outputStrategy) {
         try {

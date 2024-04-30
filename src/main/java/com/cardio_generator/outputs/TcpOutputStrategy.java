@@ -1,3 +1,7 @@
+/**
+ * Represents a writer for health monitoring simulations
+ * This class is 
+ */
 package com.cardio_generator.outputs;
 
 import java.io.IOException;

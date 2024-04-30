@@ -1,3 +1,8 @@
+/**
+ * Represents a patient blood level data generator for health monitoring simulations.
+ * This class is responsible for generating randomized, but realistic blood levels
+ * It utilizes a pseudo-random number generator to simulate the data
+ */
 package com.cardio_generator.generators;
 
 import java.util.Random;
@@ -10,6 +15,11 @@ public class BloodLevelsDataGenerator implements PatientDataGenerator {
     private final double[] baselineWhiteCells;
     private final double[] baselineRedCells;
 
+    /**
+     * Initialized BloodLevelGenerator objec
+     * 
+     * @param patientCount Amount of patients to simulate blood level data for
+     */
     public BloodLevelsDataGenerator(int patientCount) {
         // Initialize arrays to store baseline values for each patient
         baselineCholesterol = new double[patientCount + 1];
@@ -24,6 +34,13 @@ public class BloodLevelsDataGenerator implements PatientDataGenerator {
         }
     }
 
+    /**
+     * Generates blood level data for a patient
+     * cholestorol, whiteCell and redCell values are simulated with small variation around the baseline
+     * 
+     * @param patientId Patient to generate the data for
+     * @param outputStrategy Way of outputting the simulated data
+     */
     @Override
     public void generate(int patientId, OutputStrategy outputStrategy) {
         try {

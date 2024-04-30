@@ -1,3 +1,8 @@
+/**
+ * Represents a writer for health monitoring simulations
+ * This class is responsible to writing simulated data to specified files
+ * It utilizes Java IO and nio Libraries
+ */
 package com.cardio_generator.outputs;
 
 import java.io.IOException;
@@ -14,11 +19,24 @@ public class FileOutputStrategy implements OutputStrategy {
     // final instance fields to lower Camel Case
     public final ConcurrentHashMap<String, String> fileMap = new ConcurrentHashMap<>();
 
+    /**
+     * Initializes fileOutputStrategy
+     * 
+     * @param baseDirectory baseDirectory to write data to
+     */
     public fileOutputStrategy(String baseDirectory) {
 
         this.BaseDirectory = baseDirectory;
     }
 
+    /**
+     * Writes health data to file in Base Directory
+     * 
+     * @param patientId Patient the data was generated for
+     * @param timestamp point in time data was generated for
+     * @param label Type of data simulated
+     * @param data Simulated data
+     */
     @Override
     public void output(int patientId, long timestamp, String label, String data) {
         try {

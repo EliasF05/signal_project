@@ -1,3 +1,8 @@
+/**
+ * Represents a patient blood pressure data generator for health monitoring simluations
+ * This class is responsible for generating randomized, but realistic pressure data
+ * It utilizes a pseudo-random number generator to simulate the data
+ */
 package com.cardio_generator.generators;
 
 import java.util.Random;
@@ -10,6 +15,11 @@ public class BloodPressureDataGenerator implements PatientDataGenerator {
     private int[] lastSystolicValues;
     private int[] lastDiastolicValues;
 
+    /**
+     * Initializes BloodPressureDataGenerator object
+     * 
+     * @param patientCount Amount of patients to simulate blood pressure data for
+     */
     public BloodPressureDataGenerator(int patientCount) {
         lastSystolicValues = new int[patientCount + 1];
         lastDiastolicValues = new int[patientCount + 1];
@@ -21,6 +31,13 @@ public class BloodPressureDataGenerator implements PatientDataGenerator {
         }
     }
 
+    /**
+     * Generates blood pressure data for a patient
+     * Systolic values and dialostic values are simulated around realistic baselines with small random variations
+     * 
+     * @param patientId Patient to generate generate the data for
+     * @param outputStrategy Way of outputting the simulated data
+     */
     @Override
     public void generate(int patientId, OutputStrategy outputStrategy) {
         try {
