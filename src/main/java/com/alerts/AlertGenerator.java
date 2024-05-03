@@ -36,6 +36,7 @@ public class AlertGenerator {
      */
     public void evaluateData(Patient patient) {
         // Implementation goes here
+        // Check for blood pressure
     }
 
     /**
@@ -47,6 +48,6 @@ public class AlertGenerator {
      * @param alert the alert object containing details about the alert condition
      */
     private void triggerAlert(Alert alert) {
-        // Implementation might involve logging the alert or notifying staff
+        // Implementation might involve logging the alert or notifying staff        
     }
 }
