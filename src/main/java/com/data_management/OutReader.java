@@ -20,12 +20,16 @@ public class OutReader implements DataReader{
             String line;
             while ((line = bufferedReader.readLine())!=null){
                 String[] data = line.split(",");
-                
-                int parientId = Integer.parseInt(data[0]);
-                // TODO change measugohsfijae
-                double measurementValue = Double.parseDouble(data[1]);
-                String recordType = data[2];
-                Long timestamp = Long.parseLong(data[3]);
+                int parientId = Integer.parseInt(data[0].substring(data[0].length()-2, data[0].length()));
+                Long timestamp = Long.parseLong(data[1].substring(data[1].length()-13, data[1].length()));
+                String recordType = data[2].substring(7, data[2].length());
+                double measurementValue;
+                if (recordType=="Saturation"){
+                    measurementValue = Double.parseDouble(data[3].substring(6, data[3].length()-1));
+                }
+                else{
+                    measurementValue = Double.parseDouble(data[3].substring(6, data[3].length()));
+                }
                 dataStorage.addPatientData(parientId, measurementValue, recordType, timestamp);
             }
             bufferedReader.close();
