@@ -1,6 +1,7 @@
 package com.data_management;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -12,7 +13,12 @@ import java.util.List;
 public class Patient {
     private int patientId;
     private List<PatientRecord> patientRecords;
+    // Extra Fields to make alert triggering more efficient
+    private List<PatientRecord> systolicRecords;
+    private List<PatientRecord> diastolicRecords;
 
+    // Maps record type to last record of this kind
+    private HashMap<String, PatientRecord> lastRecord = new HashMap<>();
     /**
      * Constructs a new Patient with a specified ID.
      * Initializes an empty list of patient records.
@@ -38,6 +44,13 @@ public class Patient {
     public void addRecord(double measurementValue, String recordType, long timestamp) {
         PatientRecord record = new PatientRecord(this.patientId, measurementValue, recordType, timestamp);
         this.patientRecords.add(record);
+        if (recordType=="SystolicPressure"){
+            systolicRecords.add(record);
+        }
+        if (recordType=="DiastolicPressure"){
+            diastolicRecords.add(record);
+        }
+        lastRecord.put(recordType, record);
     }
 
     /**
@@ -53,6 +66,31 @@ public class Patient {
      */
     public List<PatientRecord> getRecords(long startTime, long endTime) {
         // TODO Implement and test this method
-        
     }
+
+    public List<PatientRecord> getSystolicReadings(){
+        return systolicRecords;
+    }
+
+    public List<PatientRecord> getDiastolicReadings(){
+        return diastolicRecords;
+    }
+
+    public PatientRecord getLast(String recordType){
+        if (lastRecord.containsKey(recordType)){
+            return lastRecord.get(recordType);
+        }
+        return null;
+    }
+
+
+    /**
+     * Retrieves patient ID of this patient object
+     * @return Patient ID
+     */
+    public int getPatientId(){
+        return patientId;
+    }
+
+    
 }

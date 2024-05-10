@@ -1,7 +1,11 @@
 package com.alerts;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.data_management.DataStorage;
 import com.data_management.Patient;
+import com.data_management.PatientRecord;
 
 /**
  * The {@code AlertGenerator} class is responsible for monitoring patient data
@@ -11,6 +15,7 @@ import com.data_management.Patient;
  */
 public class AlertGenerator {
     private DataStorage dataStorage;
+    
 
     /**
      * Constructs an {@code AlertGenerator} with a specified {@code DataStorage}.
@@ -36,7 +41,73 @@ public class AlertGenerator {
      */
     public void evaluateData(Patient patient) {
         // Implementation goes here
-        // Check for blood pressure
+        // Check for all critical thresholds
+        // Blood Pressure thresholds
+        PatientRecord lastSyst = patient.getLast("SystolicPressure");
+        if (lastSyst!=null){
+            if (lastSyst.getMeasurementValue()>180){
+                triggerAlert(new Alert(String.valueOf(patient.getPatientId()), "Critical Threshold Alert: Systolic Pressure>180",  lastSyst.getTimestamp()));
+            }
+            else if (lastSyst.getMeasurementValue()<90){
+                triggerAlert(new Alert(String.valueOf(patient.getPatientId()), "Critical Threshold Alert: Systolic Pressure<90",  lastSyst.getTimestamp()));
+            }
+        }
+
+        PatientRecord lastDiast = patient.getLast("DiastolicPressure");
+        if (lastDiast!=null){
+            if (lastDiast.getMeasurementValue()>120){
+                triggerAlert(new Alert(String.valueOf(patient.getPatientId()), "Critical Threshold Alert: Diastolic Pressure>120",  lastSyst.getTimestamp()));
+            }
+            else if (lastDiast.getMeasurementValue()<60){
+                triggerAlert(new Alert(String.valueOf(patient.getPatientId()), "Critical Threshold Alert: Diastolic Pressure<60",  lastSyst.getTimestamp()));
+            }
+        }
+        // Blood Saturation thresholds
+        PatientRecord lastSat = patient.getLast("Saturation");
+        if (lastSat!=null&&lastSat.getMeasurementValue()<92){
+            triggerAlert(new Alert(String.valueOf(patient.getPatientId()), "Low Saturation Alert: Blood Saturation<92", lastSat.getTimestamp()));
+        }
+
+        // Hypotensive Hypoxemia thresholds
+        if (lastSyst!=null&&lastSat!=null&&lastSyst.getMeasurementValue()<90&&lastSat.getMeasurementValue()<92){
+            triggerAlert(new Alert(String.valueOf(patient.getPatientId()), "Hypotensive Hypoxemia Alert", lastSat.getTimestamp()));
+        }
+
+        // ECG thresholds
+        PatientRecord lastECG = patient.getLast("ECG");
+        if (lastECG!=null){
+            if (lastECG.getMeasurementValue()<50){
+                triggerAlert(new Alert(String.valueOf(patient.getPatientId()), "Abnormal Heart Rate Alert: BPM<50", lastECG.getTimestamp()));
+            }
+            else if (lastECG.getMeasurementValue()>100){
+                triggerAlert(new Alert(String.valueOf(patient.getPatientId()), "Abnormal Heart Rate Alert: BPM>100", lastECG.getTimestamp()));
+            }
+        }
+
+        // Check for time-wise developements
+        
+        // find last 3 consecutive bloodPressure readings
+        List<PatientRecord> systolicReadings = patient.getDiastolicReadings();
+        List<PatientRecord> diastolicReadings = patient.getSystolicReadings();
+        
+        // Trigger for Increase/Decrease in blood pressure
+        if (systolicReadings.size()==3&&diastolicReadings.size()==3){
+            if (systolicReadings.get(2).getMeasurementValue()>systolicReadings.get(1).getMeasurementValue()+10&&systolicReadings.get(1).getMeasurementValue()>systolicReadings.get(0).getMeasurementValue()+10){
+                triggerAlert(new Alert(String.valueOf(patient.getPatientId()), "Systolic Pressure Increase Trend Alert", systolicReadings.get(2).getTimestamp()));
+            }
+            if (diastolicReadings.get(2).getMeasurementValue()>diastolicReadings.get(1).getMeasurementValue()+10&&diastolicReadings.get(1).getMeasurementValue()>diastolicReadings.get(0).getMeasurementValue()+10){
+                triggerAlert(new Alert(String.valueOf(patient.getPatientId()), "Diastolic Pressure Increase Trend Alert", diastolicReadings.get(2).getTimestamp()));
+            }
+            if (systolicReadings.get(2).getMeasurementValue()<systolicReadings.get(1).getMeasurementValue()-10&&systolicReadings.get(1).getMeasurementValue()<systolicReadings.get(0).getMeasurementValue()-10){
+                triggerAlert(new Alert(String.valueOf(patient.getPatientId()), "Systolic Pressure Decrease Trend Alert", systolicReadings.get(2).getTimestamp()));
+            }
+            if (diastolicReadings.get(2).getMeasurementValue()<diastolicReadings.get(1).getMeasurementValue()-10&&diastolicReadings.get(1).getMeasurementValue()<diastolicReadings.get(0).getMeasurementValue()-10){
+                triggerAlert(new Alert(String.valueOf(patient.getPatientId()), "Diastolic Pressure Increase Trend Alert", diastolicReadings.get(2).getTimestamp()));
+            }
+        }
+       
+
+        
     }
 
     /**
