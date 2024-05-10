@@ -16,6 +16,7 @@ public class Patient {
     // Extra Fields to make alert triggering more efficient
     private List<PatientRecord> systolicRecords;
     private List<PatientRecord> diastolicRecords;
+    private List<PatientRecord> ECGRecords;
 
     // Maps record type to last record of this kind
     private HashMap<String, PatientRecord> lastRecord = new HashMap<>();
@@ -50,6 +51,9 @@ public class Patient {
         if (recordType=="DiastolicPressure"){
             diastolicRecords.add(record);
         }
+        if (recordType=="ECG"){
+            ECGRecords.add(record);
+        }
         lastRecord.put(recordType, record);
     }
 
@@ -74,6 +78,10 @@ public class Patient {
 
     public List<PatientRecord> getDiastolicReadings(){
         return diastolicRecords;
+    }
+
+    public List<PatientRecord> getECGReadings(){
+        return ECGRecords;
     }
 
     public PatientRecord getLast(String recordType){

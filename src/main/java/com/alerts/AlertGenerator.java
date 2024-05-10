@@ -102,11 +102,29 @@ public class AlertGenerator {
                 triggerAlert(new Alert(String.valueOf(patient.getPatientId()), "Systolic Pressure Decrease Trend Alert", systolicReadings.get(2).getTimestamp()));
             }
             if (diastolicReadings.get(2).getMeasurementValue()<diastolicReadings.get(1).getMeasurementValue()-10&&diastolicReadings.get(1).getMeasurementValue()<diastolicReadings.get(0).getMeasurementValue()-10){
-                triggerAlert(new Alert(String.valueOf(patient.getPatientId()), "Diastolic Pressure Increase Trend Alert", diastolicReadings.get(2).getTimestamp()));
+                triggerAlert(new Alert(String.valueOf(patient.getPatientId()), "Diastolic Pressure Decrease Trend Alert", diastolicReadings.get(2).getTimestamp()));
             }
         }
-       
 
+        // Trigger for rapid drop in blood saturation
+        // Find blood saturation level since 10 mins ago
+        List<PatientRecord> lastTenMins = patient.getRecords(System.currentTimeMillis()-600000, System.currentTimeMillis());
+        for (PatientRecord record: lastTenMins){
+            // Check for 5% decrease
+            if (record.getRecordType()=="Saturation"){
+                if (lastSat.getMeasurementValue()<record.getMeasurementValue()-record.getMeasurementValue()/20){
+                triggerAlert(new Alert(String.valueOf(patient.getPatientId()), "Rapid Drop Alert in Blood Saturation", lastSat.getTimestamp()));
+                }
+                break;
+            }  
+        }
+       
+        // Trigger for irregular heart beat
+        // Find last 3 ECG readings, check if intervals vary by more than 20%
+        List<PatientRecord> lastThreeECGs = patient.getECGReadings().subList(patient.getECGReadings().size()-4, patient.getECGReadings().size()-1);
+        if (Math.abs((lastThreeECGs.get(1).getMeasurementValue()-lastThreeECGs.get(0).getMeasurementValue())-(lastThreeECGs.get(2).getMeasurementValue()-lastThreeECGs.get(1).getMeasurementValue()))>lastThreeECGs.get(2).getMeasurementValue()*0.20){
+            triggerAlert(new Alert(String.valueOf(patient.getPatientId()), "Irregular Beat Patterns Detected", lastThreeECGs.get(2).getTimestamp()));
+        }
         
     }
 
@@ -119,6 +137,7 @@ public class AlertGenerator {
      * @param alert the alert object containing details about the alert condition
      */
     private void triggerAlert(Alert alert) {
-        // Implementation might involve logging the alert or notifying staff        
+        // Implementation might involve logging the alert or notifying staff    
+            
     }
 }
