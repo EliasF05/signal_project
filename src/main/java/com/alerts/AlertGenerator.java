@@ -56,10 +56,10 @@ public class AlertGenerator {
         PatientRecord lastDiast = patient.getLast("DiastolicPressure");
         if (lastDiast!=null){
             if (lastDiast.getMeasurementValue()>120){
-                triggerAlert(new Alert(String.valueOf(patient.getPatientId()), "Critical Threshold Alert: Diastolic Pressure>120",  lastSyst.getTimestamp()));
+                triggerAlert(new Alert(String.valueOf(patient.getPatientId()), "Critical Threshold Alert: Diastolic Pressure>120",  lastDiast.getTimestamp()));
             }
             else if (lastDiast.getMeasurementValue()<60){
-                triggerAlert(new Alert(String.valueOf(patient.getPatientId()), "Critical Threshold Alert: Diastolic Pressure<60",  lastSyst.getTimestamp()));
+                triggerAlert(new Alert(String.valueOf(patient.getPatientId()), "Critical Threshold Alert: Diastolic Pressure<60",  lastDiast.getTimestamp()));
             }
         }
         // Blood Saturation thresholds
@@ -108,7 +108,7 @@ public class AlertGenerator {
 
         // Trigger for rapid drop in blood saturation
         // Find blood saturation level since 10 mins ago
-        List<PatientRecord> lastTenMins = patient.getRecords(System.currentTimeMillis()-600000, System.currentTimeMillis());
+        List<PatientRecord> lastTenMins = patient.getRecords(System.currentTimeMillis()-600, System.currentTimeMillis());
         for (PatientRecord record: lastTenMins){
             // Check for 5% decrease
             if (record.getRecordType()=="Saturation"){
@@ -121,11 +121,12 @@ public class AlertGenerator {
        
         // Trigger for irregular heart beat
         // Find last 3 ECG readings, check if intervals vary by more than 20%
-        List<PatientRecord> lastThreeECGs = patient.getECGReadings().subList(patient.getECGReadings().size()-4, patient.getECGReadings().size()-1);
-        if (Math.abs((lastThreeECGs.get(1).getMeasurementValue()-lastThreeECGs.get(0).getMeasurementValue())-(lastThreeECGs.get(2).getMeasurementValue()-lastThreeECGs.get(1).getMeasurementValue()))>lastThreeECGs.get(2).getMeasurementValue()*0.20){
-            triggerAlert(new Alert(String.valueOf(patient.getPatientId()), "Irregular Beat Patterns Detected", lastThreeECGs.get(2).getTimestamp()));
+        if (patient.getECGReadings().size()>2){
+            List<PatientRecord> lastThreeECGs = patient.getECGReadings().subList(patient.getECGReadings().size()-4, patient.getECGReadings().size()-1);
+            if (Math.abs((lastThreeECGs.get(1).getMeasurementValue()-lastThreeECGs.get(0).getMeasurementValue())-(lastThreeECGs.get(2).getMeasurementValue()-lastThreeECGs.get(1).getMeasurementValue()))>lastThreeECGs.get(2).getMeasurementValue()*0.20){
+                triggerAlert(new Alert(String.valueOf(patient.getPatientId()), "Irregular Beat Patterns Detected", lastThreeECGs.get(2).getTimestamp()));
+            }
         }
-        
     }
 
     /**

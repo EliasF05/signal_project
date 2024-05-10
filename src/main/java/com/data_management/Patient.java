@@ -29,6 +29,9 @@ public class Patient {
     public Patient(int patientId) {
         this.patientId = patientId;
         this.patientRecords = new ArrayList<>();
+        this.systolicRecords = new ArrayList<>();
+        this.diastolicRecords = new ArrayList<>();
+        this.ECGRecords = new ArrayList<>();
     }
 
     /**
