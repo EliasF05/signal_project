@@ -1,8 +1,7 @@
-package com;
+package com.cardio_generator;
 
 import java.io.IOException;
 
-import com.cardio_generator.HealthDataSimulator;
 import com.data_management.DataStorage;
 
 public class Main {
