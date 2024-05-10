@@ -69,7 +69,66 @@ public class Patient {
      *         range
      */
     public List<PatientRecord> getRecords(long startTime, long endTime) {
-        // TODO Implement and test this method
+        if (endTime>startTime){
+            throw new IllegalArgumentException("Start time argument must be smaller than endTime argument when retrieving patient records.");
+        }
+        // binary search to find start point
+        int left = 0;
+        int right = patientRecords.size()-1;
+        int start = -1;
+        int end = -1;
+        if (startTime<patientRecords.get(0).getTimestamp()){ start = 0;}
+        else if(startTime>patientRecords.get(patientRecords.size()-1).getTimestamp()){return new ArrayList<>();}
+        else{
+            while (left<right){
+                int m = (left+right)/2;
+                if (patientRecords.get(m).getTimestamp()==startTime){
+                    start = m;
+                    break;
+                }
+                else if(patientRecords.get(m).getTimestamp()<startTime){
+                    if(m+1<patientRecords.size()&&patientRecords.get(m+1).getTimestamp()>=startTime){
+                        start = m+1;
+                        break;
+                    }
+                    left = m+1;
+                }
+                else{
+                    if(m-1>=0&&patientRecords.get(m-1).getTimestamp()<=startTime){
+                        start = m-1;
+                        break;
+                    }
+                    right = m-1;
+                }
+            }
+        }
+        
+        //binary search to find end point
+        if(endTime>patientRecords.get(patientRecords.size()-1).getTimestamp()){end = patientRecords.size()-1;}
+        else{
+            while (left<right){
+                int m = (left+right)/2;
+                if (patientRecords.get(m).getTimestamp()==endTime){
+                    end = m;
+                    break;
+                }
+                else if(patientRecords.get(m).getTimestamp()<startTime){
+                    if(m+1<patientRecords.size()&&patientRecords.get(m+1).getTimestamp()>=endTime){
+                        end = m+1;
+                        break;
+                    }
+                    left = m+1;
+                }
+                else{
+                    if(m-1>=0&&patientRecords.get(m-1).getTimestamp()<=endTime){
+                        end = m-1;
+                        break;
+                    }
+                    right = m-1;
+                }
+            }
+        }
+        return patientRecords.subList(start, end+1);
     }
 
     public List<PatientRecord> getSystolicReadings(){
