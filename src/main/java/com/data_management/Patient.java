@@ -69,7 +69,7 @@ public class Patient {
      *         range
      */
     public List<PatientRecord> getRecords(long startTime, long endTime) {
-        if (endTime>startTime){
+        if (endTime<startTime){
             throw new IllegalArgumentException("Start time argument must be smaller than endTime argument when retrieving patient records.");
         }
         // binary search to find start point
@@ -112,7 +112,7 @@ public class Patient {
                     end = m;
                     break;
                 }
-                else if(patientRecords.get(m).getTimestamp()<startTime){
+                else if(patientRecords.get(m).getTimestamp()<endTime){
                     if(m+1<patientRecords.size()&&patientRecords.get(m+1).getTimestamp()>=endTime){
                         end = m+1;
                         break;
