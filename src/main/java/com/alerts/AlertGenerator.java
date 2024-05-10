@@ -1,6 +1,5 @@
 package com.alerts;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import com.data_management.DataStorage;
