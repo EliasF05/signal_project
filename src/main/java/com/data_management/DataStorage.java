@@ -85,7 +85,7 @@ public class DataStorage {
      */
     public static void main(String[] args) {
         // DataReader is not defined in this scope, should be initialized appropriately.
-        DataReader reader = new OutReader("target/classes/com/cardio_generator/Main.class");
+        OldDataReader reader = new OutReader("target/classes/com/cardio_generator/Main.class");
         // DataReader reader = new SomeDataReaderImplementation("path/to/data");
         DataStorage storage = new DataStorage();
 

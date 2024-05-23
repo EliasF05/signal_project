@@ -5,7 +5,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
 
-public class OutReader implements DataReader{
+public class OutReader implements OldDataReader{
     
     private String outputDir;
 
