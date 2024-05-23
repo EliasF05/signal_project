@@ -34,7 +34,7 @@ public class WebSocketTest {
 
     
     @Test
-    public void testConnect() throws URISyntaxException {
+    public void testConnect(){
         String uri = "ws://localhost:8080";
         webSocketReader = new WebSocketReader() {
             @Override
@@ -54,7 +54,7 @@ public class WebSocketTest {
     }
 
     @Test
-    public void testDisconnect() throws Exception {
+    public void testDisconnect(){
         webSocketReader = new WebSocketReader() {
             @Override
             public void disconnect() {
@@ -71,5 +71,11 @@ public class WebSocketTest {
         webSocketReader.disconnect();
 
         verify(socketClient, times(1)).disconnect();
+    }
+
+    @Test 
+    public void dataProcessingThroughWebSocket(){
+        String uri = "ws://localhost:8080";
+        // TODO (finish test)
     }
 }
