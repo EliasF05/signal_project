@@ -5,7 +5,7 @@ import java.net.URISyntaxException;
 
 public class WebSocketReader implements DataReader{
 
-    private String uri = "ws://localhost:"+8080;
+    private String uri;
     private DataStorage dataStorage;
     private SocketClient client;
 
@@ -15,6 +15,7 @@ public class WebSocketReader implements DataReader{
 
     public void connect(String uri){
         try {
+            this.uri = uri;
             client = new SocketClient(dataStorage, new URI(uri));
             client.connect();
         } catch (URISyntaxException e) {
