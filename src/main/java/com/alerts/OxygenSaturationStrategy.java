@@ -15,6 +15,15 @@ public class OxygenSaturationStrategy implements AlertStrategy{
                 return true;
             }
         }
-        return true;
+
+        // We'll also check for Hypotensive Hypoxemia in here
+        if (patient.getSystolicReadings().size()<1){
+            return false;
+        }
+        PatientRecord systData = patient.getSystolicReadings().get(patient.getSystolicReadings().size()-1);
+        if (data.getMeasurementValue()<92&&systData.getMeasurementValue()<90){
+            return true;
+        }
+        return false;
     }
 }
