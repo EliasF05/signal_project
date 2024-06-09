@@ -1,5 +1,8 @@
 package com.alerts;
 
+import com.data_management.Patient;
+import com.data_management.PatientRecord;
+
 public interface AlertStrategy {
-    public void checkAlert();
+    public boolean checkAlert(Patient patient);
 }

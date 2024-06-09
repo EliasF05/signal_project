@@ -17,6 +17,7 @@ public class Patient {
     private List<PatientRecord> systolicRecords;
     private List<PatientRecord> diastolicRecords;
     private List<PatientRecord> ECGRecords;
+    private List<PatientRecord> saturationRecords;
 
     // Maps record type to last record of this kind
     private HashMap<String, PatientRecord> lastRecord = new HashMap<>();
@@ -32,6 +33,7 @@ public class Patient {
         this.systolicRecords = new ArrayList<>();
         this.diastolicRecords = new ArrayList<>();
         this.ECGRecords = new ArrayList<>();
+        this.saturationRecords = new ArrayList<>();
     }
 
     /**
@@ -56,6 +58,9 @@ public class Patient {
         }
         if (recordType=="ECG"){
             ECGRecords.add(record);
+        }
+        if (recordType=="Saturation"){
+            saturationRecords.add(record);
         }
         lastRecord.put(recordType, record);
     }
@@ -144,6 +149,10 @@ public class Patient {
 
     public List<PatientRecord> getECGReadings(){
         return ECGRecords;
+    }
+
+    public List<PatientRecord> getSaturationReadings(){
+        return saturationRecords;
     }
 
     public PatientRecord getLast(String recordType){
