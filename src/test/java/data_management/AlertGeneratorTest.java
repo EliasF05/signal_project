@@ -7,6 +7,8 @@ import com.data_management.DataStorage;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import javax.xml.crypto.Data;
+
 /**
  * AlertGeneratorTest
  * 
@@ -22,7 +24,8 @@ public class AlertGeneratorTest {
 
     @Test
     void testBloodPressureAlerts(){
-        DataStorage storage = new DataStorage();
+        DataStorage.reset();
+        DataStorage storage = DataStorage.getInstance();
         // Simulate data that should trigger blood pressure alerts
       
         
@@ -40,7 +43,8 @@ public class AlertGeneratorTest {
 
     @Test
     void testSaturationAlerts(){
-        DataStorage storage = new DataStorage();
+        DataStorage.reset();
+        DataStorage storage = DataStorage.getInstance();
         // Simulate data that should trigger blood saturation alerts
         storage.addPatientData(2024, 91, "Saturation", System.currentTimeMillis());
         storage.addPatientData(2025, 99, "Saturation", System.currentTimeMillis());
@@ -56,7 +60,8 @@ public class AlertGeneratorTest {
 
     @Test
     void testHypotensiveHypoxemiaAlerts(){
-        DataStorage storage = new DataStorage();
+        DataStorage.reset();
+        DataStorage storage = DataStorage.getInstance();
         // Simulate data that should trigger hypotensive hypoxemia alerts
         storage.addPatientData(2024, 89, "SystolicPressure", System.currentTimeMillis());
         storage.addPatientData(2024, 91, "Saturation", System.currentTimeMillis()); 
@@ -69,7 +74,8 @@ public class AlertGeneratorTest {
 
     @Test
     void testECGAlerts(){
-        DataStorage storage = new DataStorage();
+        DataStorage.reset();
+        DataStorage storage = DataStorage.getInstance();
         // Simulate data that should trigger ECG alerts
         storage.addPatientData(2028, 33, "ECG", System.currentTimeMillis());
         storage.addPatientData(2028, 180, "ECG", System.currentTimeMillis());

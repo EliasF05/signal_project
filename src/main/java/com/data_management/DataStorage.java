@@ -15,7 +15,7 @@ import com.alerts.AlertGenerator;
  */
 public class DataStorage {
     private Map<Integer, Patient> patientMap; // Stores patient objects indexed by their unique patient ID.
-    private DataStorage singleton;
+    private static DataStorage singleton;
     /**
      * Constructs a new instance of DataStorage, initializing the underlying storage
      * structure.
@@ -28,11 +28,19 @@ public class DataStorage {
      * 
      * @return Singleton DataStorage object
      */
-    public DataStorage getInstance(){
+    public static DataStorage getInstance(){
         if(singleton==null){
             singleton = new DataStorage();
         }
         return singleton;
+    }
+
+    /**
+     * resets singleton object to null for testing purposes.
+     * highly advised not to call this method outside of testing!
+     */
+    public static void reset(){
+        singleton = null;
     }
 
     /**

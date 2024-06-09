@@ -33,7 +33,7 @@ public class HealthDataSimulator {
     private int patientCount;
     private OutputStrategy outputStrategy;
 
-    private HealthDataSimulator singleton;
+    private static HealthDataSimulator singleton;
     public static void main(String[] args) throws IOException {
         HealthDataSimulator simulator = new HealthDataSimulator();
         simulator.parseArguments(args);
@@ -51,7 +51,7 @@ public class HealthDataSimulator {
         this.outputStrategy = new ConsoleOutputStrategy();
     }
 
-    public HealthDataSimulator getInstance(){
+    public static HealthDataSimulator getInstance(){
         if (singleton==null){
             singleton = new HealthDataSimulator();
         }
