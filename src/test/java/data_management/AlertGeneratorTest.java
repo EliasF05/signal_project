@@ -7,8 +7,6 @@ import com.data_management.DataStorage;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import javax.xml.crypto.Data;
-
 /**
  * AlertGeneratorTest
  * 

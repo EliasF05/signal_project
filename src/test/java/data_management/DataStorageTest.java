@@ -8,8 +8,6 @@ import com.data_management.PatientRecord;
 
 import java.util.List;
 
-import javax.xml.crypto.Data;
-
 class DataStorageTest {
 
     @Test
