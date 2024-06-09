@@ -42,89 +42,19 @@ public class AlertGenerator {
         // Implementation goes here
         // Check for all critical thresholds
         // Blood Pressure thresholds
-        PatientRecord lastSyst = patient.getLast("SystolicPressure");
-        if (lastSyst!=null){
-            if (lastSyst.getMeasurementValue()>180){
-                triggerAlert(new BasicAlert(String.valueOf(patient.getPatientId()), "Critical Threshold Alert: Systolic Pressure>180",  lastSyst.getTimestamp()));
-            }
-            else if (lastSyst.getMeasurementValue()<90){
-                triggerAlert(new BasicAlert(String.valueOf(patient.getPatientId()), "Critical Threshold Alert: Systolic Pressure<90",  lastSyst.getTimestamp()));
-            }
-        }
-
-        PatientRecord lastDiast = patient.getLast("DiastolicPressure");
-        if (lastDiast!=null){
-            if (lastDiast.getMeasurementValue()>120){
-                triggerAlert(new BasicAlert(String.valueOf(patient.getPatientId()), "Critical Threshold Alert: Diastolic Pressure>120",  lastDiast.getTimestamp()));
-            }
-            else if (lastDiast.getMeasurementValue()<60){
-                triggerAlert(new BasicAlert(String.valueOf(patient.getPatientId()), "Critical Threshold Alert: Diastolic Pressure<60",  lastDiast.getTimestamp()));
-            }
+        BloodPressureStrategy pressureStrats = new BloodPressureStrategy();
+        if (pressureStrats.checkAlert(patient)){
+            triggerAlert(new BloodPressureAlert(String.valueOf(patient.getPatientId()), "Abnormal blood pressure patterns detected!", System.currentTimeMillis()));
         }
         // Blood Saturation thresholds
-        PatientRecord lastSat = patient.getLast("Saturation");
-        if (lastSat!=null&&lastSat.getMeasurementValue()<92){
-            triggerAlert(new BasicAlert(String.valueOf(patient.getPatientId()), "Low Saturation Alert: Blood Saturation<92", lastSat.getTimestamp()));
+        OxygenSaturationStrategy oxygenStrats = new OxygenSaturationStrategy();
+        if (oxygenStrats.checkAlert(patient)){
+            triggerAlert(new BloodOxygenAlert(String.valueOf(patient.getPatientId()), "Abnormal blood saturation patterns detected", System.currentTimeMillis()));
         }
 
-        // Hypotensive Hypoxemia thresholds
-        if (lastSyst!=null&&lastSat!=null&&lastSyst.getMeasurementValue()<90&&lastSat.getMeasurementValue()<92){
-            triggerAlert(new BasicAlert(String.valueOf(patient.getPatientId()), "Hypotensive Hypoxemia Alert", lastSat.getTimestamp()));
-        }
-
-        // ECG thresholds
-        PatientRecord lastECG = patient.getLast("ECG");
-        if (lastECG!=null){
-            if (lastECG.getMeasurementValue()<50){
-                triggerAlert(new BasicAlert(String.valueOf(patient.getPatientId()), "Abnormal Heart Rate Alert: BPM<50", lastECG.getTimestamp()));
-            }
-            else if (lastECG.getMeasurementValue()>100){
-                triggerAlert(new BasicAlert(String.valueOf(patient.getPatientId()), "Abnormal Heart Rate Alert: BPM>100", lastECG.getTimestamp()));
-            }
-        }
-
-        // Check for time-wise developements
-        
-        // find last 3 consecutive bloodPressure readings
-        List<PatientRecord> systolicReadings = patient.getDiastolicReadings();
-        List<PatientRecord> diastolicReadings = patient.getSystolicReadings();
-        
-        // Trigger for Increase/Decrease in blood pressure
-        if (systolicReadings.size()==3&&diastolicReadings.size()==3){
-            if (systolicReadings.get(2).getMeasurementValue()>systolicReadings.get(1).getMeasurementValue()+10&&systolicReadings.get(1).getMeasurementValue()>systolicReadings.get(0).getMeasurementValue()+10){
-                triggerAlert(new BasicAlert(String.valueOf(patient.getPatientId()), "Systolic Pressure Increase Trend Alert", systolicReadings.get(2).getTimestamp()));
-            }
-            if (diastolicReadings.get(2).getMeasurementValue()>diastolicReadings.get(1).getMeasurementValue()+10&&diastolicReadings.get(1).getMeasurementValue()>diastolicReadings.get(0).getMeasurementValue()+10){
-                triggerAlert(new BasicAlert(String.valueOf(patient.getPatientId()), "Diastolic Pressure Increase Trend Alert", diastolicReadings.get(2).getTimestamp()));
-            }
-            if (systolicReadings.get(2).getMeasurementValue()<systolicReadings.get(1).getMeasurementValue()-10&&systolicReadings.get(1).getMeasurementValue()<systolicReadings.get(0).getMeasurementValue()-10){
-                triggerAlert(new BasicAlert(String.valueOf(patient.getPatientId()), "Systolic Pressure Decrease Trend Alert", systolicReadings.get(2).getTimestamp()));
-            }
-            if (diastolicReadings.get(2).getMeasurementValue()<diastolicReadings.get(1).getMeasurementValue()-10&&diastolicReadings.get(1).getMeasurementValue()<diastolicReadings.get(0).getMeasurementValue()-10){
-                triggerAlert(new BasicAlert(String.valueOf(patient.getPatientId()), "Diastolic Pressure Decrease Trend Alert", diastolicReadings.get(2).getTimestamp()));
-            }
-        }
-
-        // Trigger for rapid drop in blood saturation
-        // Find blood saturation level since 10 mins ago
-        List<PatientRecord> lastTenMins = patient.getRecords(System.currentTimeMillis()-600, System.currentTimeMillis());
-        for (PatientRecord record: lastTenMins){
-            // Check for 5% decrease
-            if (record.getRecordType()=="Saturation"){
-                if (lastSat.getMeasurementValue()<record.getMeasurementValue()-record.getMeasurementValue()/20){
-                triggerAlert(new BasicAlert(String.valueOf(patient.getPatientId()), "Rapid Drop Alert in Blood Saturation", lastSat.getTimestamp()));
-                }
-                break;
-            }  
-        }
-       
-        // Trigger for irregular heart beat
-        // Find last 3 ECG readings, check if intervals vary by more than 20%
-        if (patient.getECGReadings().size()>2){
-            List<PatientRecord> lastThreeECGs = patient.getECGReadings().subList(patient.getECGReadings().size()-4, patient.getECGReadings().size()-1);
-            if (Math.abs((lastThreeECGs.get(1).getMeasurementValue()-lastThreeECGs.get(0).getMeasurementValue())-(lastThreeECGs.get(2).getMeasurementValue()-lastThreeECGs.get(1).getMeasurementValue()))>lastThreeECGs.get(2).getMeasurementValue()*0.20){
-                triggerAlert(new BasicAlert(String.valueOf(patient.getPatientId()), "Irregular Beat Patterns Detected", lastThreeECGs.get(2).getTimestamp()));
-            }
+        HeartRateStrategy ecgStrats = new HeartRateStrategy();
+        if (ecgStrats.checkAlert(patient)){
+            triggerAlert(new ECGAlert(String.valueOf(patient.getPatientId()), "Abnormal ECG patterns detected", System.currentTimeMillis()));
         }
     }
 

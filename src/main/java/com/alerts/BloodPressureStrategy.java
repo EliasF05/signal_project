@@ -16,7 +16,7 @@ public class BloodPressureStrategy implements AlertStrategy{
         int systLength = systPressure.size();
         if (systLength>0){
             PatientRecord lastSystReading = systPressure.get(systLength-1);
-            if (lastSystReading.getMeasurementValue()>180||lastSystReading.getMeasurementValue()<90){
+            if (lastSystReading.getMeasurementValue()>=180||lastSystReading.getMeasurementValue()<90){
                 return true;
             }
         }
@@ -24,7 +24,7 @@ public class BloodPressureStrategy implements AlertStrategy{
         int diastLength = diastPressure.size();
         if (diastLength>0){
             PatientRecord diastRecord = diastPressure.get(diastLength-1);
-            if (diastRecord.getMeasurementValue()>120||diastRecord.getMeasurementValue()<60){
+            if (diastRecord.getMeasurementValue()>=120||diastRecord.getMeasurementValue()<60){
                 return true;
             }
         }

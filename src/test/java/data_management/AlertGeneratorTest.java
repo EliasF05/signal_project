@@ -1,86 +1,149 @@
 package data_management;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import com.alerts.AlertGenerator;
-import com.data_management.DataStorage;
-
 import static org.junit.jupiter.api.Assertions.*;
+import java.util.List;
+import com.data_management.DataStorage;
+import com.data_management.Patient;
+import com.data_management.PatientRecord;
+import com.alerts.AlertGenerator;
 
 /**
- * AlertGeneratorTest
- * 
- * General Logic behind these tests:
- * Testing how many things are logged as patient data in the storage, as alerts are also logged
- * So if there is a measurement that triggers an alert, for example an ECG<50, then the amount of Patient Data in the storage for 
- * this patient is:
- * originalMeasurement+triggerAlert = 2
- * This way we can confirm an alert has been triggered. We can be confident it is the right alarm, as all testcases pass 
- * for different alerts, and it is very easily verifable from the logic in AlertGenerator.evaluate(), that no wrong alarm can be triggered.
+ * Test cases for AlertGenerator class.
  */
-public class AlertGeneratorTest {
+class AlertGeneratorTest {
+
+    private DataStorage dataStorage;
+    private AlertGenerator alertGenerator;
+
+    @BeforeEach
+    void setUp() {
+        dataStorage = DataStorage.getInstance();
+        alertGenerator = new AlertGenerator(dataStorage);
+        DataStorage.reset(); // Ensure data storage is reset before each test
+    }
 
     @Test
-    void testBloodPressureAlerts(){
-        DataStorage.reset();
-        DataStorage storage = DataStorage.getInstance();
-        // Simulate data that should trigger blood pressure alerts
-      
+    void testNoAlertTriggered() {
+        Patient patient = new Patient(1);
+        patient.addRecord(120, "SystolicPressure", System.currentTimeMillis());
+        patient.addRecord(80, "DiastolicPressure", System.currentTimeMillis());
+        patient.addRecord(98, "Saturation", System.currentTimeMillis());
+        patient.addRecord(70, "HeartRate", System.currentTimeMillis());
+
+        alertGenerator.evaluateData(patient);
+
+        assertTrue(dataStorage.getRecords(1, 0, System.currentTimeMillis()).isEmpty(), 
+                   "No alerts should be triggered for normal values");
+    }
+
+    @Test
+    void testBloodPressureAlertTriggered() {
+        Patient patient = new Patient(2);
+        patient.addRecord(180, "SystolicPressure", System.currentTimeMillis());
+        patient.addRecord(120, "DiastolicPressure", System.currentTimeMillis());
+        patient.addRecord(98, "Saturation", System.currentTimeMillis());
+        patient.addRecord(70, "ECG", System.currentTimeMillis());
+
+        alertGenerator.evaluateData(patient);
+
+        List<PatientRecord> records = dataStorage.getRecords(2, 0, System.currentTimeMillis()+1);
+        assertEquals(1, records.size(), "One alert should be triggered for high blood pressure");
+        assertEquals("Abnormal blood pressure patterns detected!", records.get(0).getRecordType());
+    }
+
+    @Test
+    void testBloodOxygenAlertTriggered() {
+        Patient patient = new Patient(3);
+        patient.addRecord(120, "SystolicPressure", System.currentTimeMillis());
+        patient.addRecord(80, "DiastolicPressure", System.currentTimeMillis());
+        patient.addRecord(85, "Saturation", System.currentTimeMillis());
+        patient.addRecord(70, "ECG", System.currentTimeMillis());
+
+        alertGenerator.evaluateData(patient);
+
+        List<PatientRecord> records = dataStorage.getRecords(3, 0, System.currentTimeMillis()+1);
+        assertEquals(1, records.size(), "One alert should be triggered for low blood oxygen");
+        assertEquals("Abnormal blood saturation patterns detected", records.get(0).getRecordType());
+    }
+
+    @Test
+    void testHeartRateAlertTriggered() {
+        Patient patient = new Patient(4);
+        patient.addRecord(120, "SystolicPressure", System.currentTimeMillis());
+        patient.addRecord(80, "DiastolicPressure", System.currentTimeMillis());
+        patient.addRecord(98, "Saturation", System.currentTimeMillis());
+        patient.addRecord(150, "ECG", System.currentTimeMillis());
+
+        alertGenerator.evaluateData(patient);
+
+        List<PatientRecord> records = dataStorage.getRecords(4, 0, System.currentTimeMillis()+1);
+        assertEquals(1, records.size(), "One alert should be triggered for abnormal heart rate");
+        assertEquals("Abnormal ECG patterns detected", records.get(0).getRecordType());
+    }
+
+    @Test
+    void testMultipleAlertsTriggered() {
+        Patient patient = new Patient(5);
+        patient.addRecord(180, "SystolicPressure", System.currentTimeMillis());
+        patient.addRecord(120, "DiastolicPressure", System.currentTimeMillis());
+        patient.addRecord(85, "Saturation", System.currentTimeMillis());
+        patient.addRecord(150, "ECG", System.currentTimeMillis());
+
+        alertGenerator.evaluateData(patient);
+
+        List<PatientRecord> records = dataStorage.getRecords(5, 0, System.currentTimeMillis()+1);
+        assertEquals(3, records.size(), "Three alerts should be triggered for multiple abnormal values");
+    }
+
+    @Test
+    void testEdgeCaseLowBloodPressure() {
+        Patient patient = new Patient(6);
+        patient.addRecord(90, "SystolicPressure", System.currentTimeMillis());
+        patient.addRecord(60, "DiastolicPressure", System.currentTimeMillis());
+        patient.addRecord(98, "Saturation", System.currentTimeMillis());
+        patient.addRecord(70, "HeartRate", System.currentTimeMillis());
+
+        alertGenerator.evaluateData(patient);
+
+        List<PatientRecord> records = dataStorage.getRecords(6, 0, System.currentTimeMillis());
+        assertTrue(records.isEmpty(), "No alerts should be triggered for low but not critical blood pressure");
+    }
+
+    @Test
+    void testEdgeCaseHighHeartRate() {
+        Patient patient = new Patient(7);
+        patient.addRecord(120, "SystolicPressure", System.currentTimeMillis());
+        patient.addRecord(80, "DiastolicPressure", System.currentTimeMillis());
+        patient.addRecord(98, "Saturation", System.currentTimeMillis());
+        patient.addRecord(100, "HeartRate", System.currentTimeMillis());
+
+        alertGenerator.evaluateData(patient);
+
+        List<PatientRecord> records = dataStorage.getRecords(7, 0, System.currentTimeMillis());
+        assertTrue(records.isEmpty(), "No alerts should be triggered for high but not critical heart rate");
+    }
+
+    @Test
+    void testBloodPressureTrendAlertTriggered() {
+        Patient patient = new Patient(8);
+        long currentTime = System.currentTimeMillis();
         
-        storage.addPatientData(2024, 190, "SystolicPressure", System.currentTimeMillis());
-        storage.addPatientData(2025, 55, "DiastolicPressure", System.currentTimeMillis());
-    
-        AlertGenerator hopeThisWorks = new AlertGenerator(storage);
-        hopeThisWorks.evaluateData(storage.getAllPatients().get(0));
-        hopeThisWorks.evaluateData(storage.getAllPatients().get(1));
+        // Add systolic pressure readings with increasing trend
+        patient.addRecord(120, "SystolicPressure", currentTime - 3000);
+        patient.addRecord(130, "SystolicPressure", currentTime - 2000);
+        patient.addRecord(145, "SystolicPressure", currentTime - 1000);
         
-        // Check that alerts have been added to records as length exceeds one for each patient
-        assertEquals(2, storage.getRecords(2024, 0, System.currentTimeMillis()+1).size());
-        assertEquals(2, storage.getRecords(2025, 0, System.currentTimeMillis()+1).size());
-    }
+        // Add diastolic pressure readings with increasing trend
+        patient.addRecord(80, "DiastolicPressure", currentTime - 3000);
+        patient.addRecord(90, "DiastolicPressure", currentTime - 2000);
+        patient.addRecord(100, "DiastolicPressure", currentTime - 1000);
 
-    @Test
-    void testSaturationAlerts(){
-        DataStorage.reset();
-        DataStorage storage = DataStorage.getInstance();
-        // Simulate data that should trigger blood saturation alerts
-        storage.addPatientData(2024, 91, "Saturation", System.currentTimeMillis());
-        storage.addPatientData(2025, 99, "Saturation", System.currentTimeMillis());
-        storage.addPatientData(2025, 93, "Saturation", System.currentTimeMillis());
+        alertGenerator.evaluateData(patient);
 
-        AlertGenerator hopeThisWorksToo = new AlertGenerator(storage);
-        hopeThisWorksToo.evaluateData(storage.getAllPatients().get(0));
-        hopeThisWorksToo.evaluateData(storage.getAllPatients().get(1));
-        // Check that alerts have been added to records 
-        assertEquals(2, storage.getRecords(2024, 0, System.currentTimeMillis()+1).size());
-        assertEquals(3, storage.getRecords(2025, 0, System.currentTimeMillis()+1).size());
-    }
-
-    @Test
-    void testHypotensiveHypoxemiaAlerts(){
-        DataStorage.reset();
-        DataStorage storage = DataStorage.getInstance();
-        // Simulate data that should trigger hypotensive hypoxemia alerts
-        storage.addPatientData(2024, 89, "SystolicPressure", System.currentTimeMillis());
-        storage.addPatientData(2024, 91, "Saturation", System.currentTimeMillis()); 
-
-        AlertGenerator stillHoping = new AlertGenerator(storage);
-        stillHoping.evaluateData(storage.getAllPatients().get(0));
-        // Check that alerts have been added to records (Systolic too low, saturation too low and Hypoxemia, so 3+2=5 in this case)
-        assertEquals(5, storage.getRecords(2024, 0, System.currentTimeMillis()+1).size());
-    }
-
-    @Test
-    void testECGAlerts(){
-        DataStorage.reset();
-        DataStorage storage = DataStorage.getInstance();
-        // Simulate data that should trigger ECG alerts
-        storage.addPatientData(2028, 33, "ECG", System.currentTimeMillis());
-        storage.addPatientData(2028, 180, "ECG", System.currentTimeMillis());
-
-        AlertGenerator dontStopBelievin = new AlertGenerator(storage);
-        dontStopBelievin.evaluateData(storage.getAllPatients().get(0));
-        // Check that alerts have been added to records
-        assertEquals(3, storage.getRecords(2028, 0, System.currentTimeMillis()+1).size());
+        List<PatientRecord> records = dataStorage.getRecords(8, 0, System.currentTimeMillis()+1);
+        assertEquals(1, records.size(), "One alert should be triggered for blood pressure trend");
+        assertEquals("Abnormal blood pressure patterns detected!", records.get(0).getRecordType());
     }
 }

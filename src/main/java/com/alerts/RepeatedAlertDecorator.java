@@ -12,4 +12,8 @@ public class RepeatedAlertDecorator extends AlertDecorator {
         // Logic to check and repeat the alert based on the repeatInterval
         System.out.println("Checking and repeating alert every " + repeatInterval + " seconds for patient " + getPatientId());
     }
+
+    public Alert getDecoratedAlert(){
+        return super.decoratedAlert;
+    }
 }

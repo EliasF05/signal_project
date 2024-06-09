@@ -51,6 +51,10 @@ public class HealthDataSimulator {
         this.outputStrategy = new ConsoleOutputStrategy();
     }
 
+    public static void reset(){
+        singleton = null;
+    }
+
     public static HealthDataSimulator getInstance(){
         if (singleton==null){
             singleton = new HealthDataSimulator();
@@ -70,7 +74,11 @@ public class HealthDataSimulator {
         scheduler = newScheduler;
     }
 
-    private void parseArguments(String[] args) throws IOException {
+    public OutputStrategy getOutputStrategy(){
+        return outputStrategy;
+    }
+
+    public void parseArguments(String[] args) throws IOException {
         for (int i = 0; i < args.length; i++) {
             switch (args[i]) {
                 case "-h":
@@ -148,7 +156,7 @@ public class HealthDataSimulator {
                 "  This command simulates data for 100 patients and sends the output to WebSocket clients connected to port 8080.");
     }
 
-    private List<Integer> initializePatientIds(int patientCount) {
+    public List<Integer> initializePatientIds(int patientCount) {
         List<Integer> patientIds = new ArrayList<>();
         for (int i = 1; i <= patientCount; i++) {
             patientIds.add(i);
@@ -156,7 +164,7 @@ public class HealthDataSimulator {
         return patientIds;
     }
 
-    private void scheduleTasksForPatients(List<Integer> patientIds) {
+    public void scheduleTasksForPatients(List<Integer> patientIds) {
         ECGDataGenerator ecgDataGenerator = new ECGDataGenerator(patientCount);
         BloodSaturationDataGenerator bloodSaturationDataGenerator = new BloodSaturationDataGenerator(patientCount);
         BloodPressureDataGenerator bloodPressureDataGenerator = new BloodPressureDataGenerator(patientCount);

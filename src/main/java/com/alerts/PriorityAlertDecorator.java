@@ -16,4 +16,8 @@ public class PriorityAlertDecorator extends AlertDecorator {
     public String getCondition() {
         return super.getCondition() + " (Priority: " + priorityLevel + ")";
     }
+
+    public Alert getDecoratedAlert(){
+        return super.decoratedAlert;
+    }
 }
